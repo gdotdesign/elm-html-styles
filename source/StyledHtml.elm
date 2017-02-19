@@ -1,4 +1,4 @@
-module StyledHtml exposing (node, style, selector, pseudo)
+module StyledHtml exposing (styles, selector, pseudo)
 
 import Html.Attributes exposing (property)
 import Html
@@ -8,18 +8,13 @@ import Json.Encode as Json
 import Native.Styles
 
 type Selector
-  = None
-  | Child String
+  = Child String
   | Pseudo String
 
 type alias Style =
   { selector : Selector
   , data : List (String, String)
   }
-
-style : List (String, String) -> Style
-style =
-  Style None
 
 selector : String -> List (String, String) -> Style
 selector string =
@@ -29,8 +24,8 @@ pseudo : String -> List (String, String) -> Style
 pseudo string =
   Style (Pseudo string)
 
-encodeStyles : List Style -> Json.Value
-encodeStyles styles =
+encodeStyles : List (String, String) -> List Style -> Json.Value
+encodeStyles selfStyles styles =
   let
     isChild style =
       case style.selector of
@@ -42,16 +37,8 @@ encodeStyles styles =
         Pseudo _ -> True
         _ -> False
 
-    isNone style =
-      case style.selector of
-        None -> True
-        _ -> False
-
     baseData =
-      styles
-      |> List.filter isNone
-      |> List.map .data
-      |> List.foldr (++) []
+      selfStyles
       |> encodeData
 
     encodeItem item =
@@ -60,7 +47,6 @@ encodeStyles styles =
           case item.selector of
             Pseudo value -> value
             Child value -> value
-            _ -> ""
       in
         Json.object
         [ ("selector", Json.string selector )
@@ -93,10 +79,6 @@ encodeStyles styles =
       , ("childs", childs)
       ]
 
-node : String -> List Style -> List (Html.Attribute msg) -> List (Html.Html msg) -> Html.Html msg
-node tag styles attributes children =
-  let
-    styleAttribute =
-      property "styles" (encodeStyles styles)
-  in
-    Html.node tag (styleAttribute :: attributes) children
+styles : List (String, String) -> List Style -> Html.Attribute msg
+styles selfStyles styles =
+  property "styles" (encodeStyles selfStyles styles)

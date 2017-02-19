@@ -1,7 +1,7 @@
-import StyledHtml exposing (node, style, selector, pseudo)
+import StyledHtml exposing (styles, selector, pseudo)
 
 import Html.Events exposing (onClick)
-import Html exposing (text)
+import Html exposing (node, text)
 import Html.Lazy
 
 import Mouse
@@ -31,17 +31,18 @@ view model =
     child =
       if model.show then
         node "strong"
-          [ style [("color", "cyan")]
-          , pseudo "::before"
-            [ ("content", "'Hello'")
-            , ("color", "rebeccapurple")
-            , ("font-weight", "bold")
+          [ styles
+            [("color", "cyan")]
+            [ pseudo "::before"
+              [ ("content", "'Hello'")
+              , ("color", "rebeccapurple")
+              , ("font-weight", "bold")
+              ]
+            , selector "i"
+              [ ("letter-spacing", "10px")]
             ]
-          , selector "i"
-            [ ("letter-spacing", "10px")]
           ]
-          []
-          [ node "i" [] [] [text "strong"] ]
+          [ node "i" [] [text "strong"] ]
       else
         text ""
 
@@ -52,32 +53,33 @@ view model =
         "none"
   in
     node "div"
-      [ style
+      [ styles
         [ ("background", "red")
         , ("position", "absolute")
         , ("padding", "20px")
         , ("font-family", "sans")
         ]
+        []
       ]
-      []
       [ node "span"
-        [ style
+        [ styles
           [("font-size", "20px")
           ,("display", display)
           ,("color", "#FFF")
           ]
+          []
         ]
-        []
         [text "Blah"]
       , child
       , node "button"
-        [ style
+        [ styles
           [ ("background", "blue")
           , ("border", "0")
           , ("color", "#FFF")
           ]
+          []
+        , onClick Toggle
         ]
-        [ onClick Toggle ]
         [ text "Toggle" ]
       ]
 
@@ -87,5 +89,5 @@ main =
     { init = (init, Cmd.none)
     , update = update
     , view = Html.Lazy.lazy view
-    , subscriptions = \_ -> Sub.none --Mouse.moves Move
+    , subscriptions = \_ -> Mouse.moves Move
     }
