@@ -1,4 +1,4 @@
-module Styles exposing (styles, selector, pseudo)
+module Html.Styles exposing (styles, selector, pseudo)
 
 {-| This module provides a way to add CSS styles to your HTML elements easily.
 

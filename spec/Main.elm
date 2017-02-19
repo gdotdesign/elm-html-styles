@@ -1,16 +1,13 @@
-import Styles exposing (styles, selector, pseudo)
-
+import Html.Styles exposing (styles, selector, pseudo)
 import Html.Events exposing (onClick)
 import Html exposing (node, text)
 import Html.Lazy
 
-import Mouse
-
 type alias Model =
   { show : Bool }
 
-type Msg = Toggle
-  | Move Mouse.Position
+type Msg
+  = Toggle
 
 init : Model
 init =
@@ -19,9 +16,6 @@ init =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg_ model =
   case msg_ of
-    Move pos ->
-      (model, Cmd.none)
-
     Toggle ->
       ({ model | show = not model.show }, Cmd.none)
 
@@ -89,5 +83,5 @@ main =
     { init = (init, Cmd.none)
     , update = update
     , view = Html.Lazy.lazy view
-    , subscriptions = \_ -> Mouse.moves Move
+    , subscriptions = \_ -> Sub.none
     }
