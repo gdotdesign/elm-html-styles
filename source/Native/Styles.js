@@ -19,16 +19,29 @@
     // Get the styles object
     var style = rule.style
 
-    // TODO: Remove no longer present styles
+    var i
+
+    // Remove non existent styles
+    for (i = 0; i < (rule.previousData || []).length; i++) {
+      var index = data.findIndex(function (item) {
+        return item[0] === rule.previousData[i][0]
+      })
+
+      if (index === -1) {
+        style.removeProperty(rule.previousData[i][0])
+      }
+    }
 
     // Set the styles
-    for (var i = 0; i < data.length; i++) {
+    for (i = 0; i < data.length; i++) {
       var prop = data[i][0]
       var value = data[i][1]
       if (style.getPropertyValue(prop) !== value) {
         style.setProperty(prop, value)
       }
     }
+
+    rule.previousData = data
   }
 
   /* This function returns a [rule](https://developer.mozilla.org/en-US/docs/Web/API/CSSRule)

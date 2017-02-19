@@ -44,9 +44,9 @@ view model =
 
     display =
       if model.show then
-        "block"
+        []
       else
-        "none"
+        [( "display", "none" )]
   in
     node "div"
       [ styles
@@ -58,10 +58,9 @@ view model =
       ]
       [ node "span"
         [ styles
-          [("font-size", "20px")
-          ,("display", display)
+          ([("font-size", "20px")
           ,("color", "#FFF")
-          ]
+          ] ++ display)
           []
         ]
         [text "Blah"]
@@ -90,6 +89,19 @@ specs =
         { style = "padding"
         , selector = "div"
         , value = "20px"
+        }
+      ]
+    , it "Removes not used properties"
+      [ assert.styleEquals
+        { style = "display"
+        , selector = "span"
+        , value = "none"
+        }
+      , steps.click "button"
+      , assert.styleEquals
+        { style = "display"
+        , selector = "span"
+        , value = ""
         }
       ]
     , it "Applies sub selectors"
