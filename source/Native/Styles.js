@@ -19,6 +19,8 @@
     // Get the styles object
     var style = rule.style
 
+    // TODO: Remove no longer present styles
+
     // Set the styles
     for (var i = 0; i < data.length; i++) {
       var prop = data[i][0]
