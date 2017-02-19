@@ -3,14 +3,16 @@ import Html.Events exposing (onClick)
 import Html exposing (node, text)
 import Html.Lazy
 
+import Spec exposing (..)
+
 type alias Model =
   { show : Bool }
 
 type Msg
   = Toggle
 
-init : Model
-init =
+init : () -> Model
+init _ =
   { show = False }
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -49,7 +51,6 @@ view model =
     node "div"
       [ styles
         [ ("background", "red")
-        , ("position", "absolute")
         , ("padding", "20px")
         , ("font-family", "sans")
         ]
@@ -77,11 +78,34 @@ view model =
         [ text "Toggle" ]
       ]
 
+specs =
+  describe "Html.Styles"
+    [ it "Applies base styles"
+      [ assert.styleEquals
+        { style = "background"
+        , selector = "div"
+        , value = "red"
+        }
+      , assert.styleEquals
+        { style = "padding"
+        , selector = "div"
+        , value = "20px"
+        }
+      ]
+    , it "Applies sub selectors"
+      [ steps.click "button"
+      , assert.styleEquals
+        { style = "letter-spacing"
+        , selector = "i"
+        , value = "10px"
+        }
+      ]
+    ]
 
 main =
-  Html.program
-    { init = (init, Cmd.none)
+  runWithProgram
+    { subscriptions = \_ -> Sub.none
     , update = update
-    , view = Html.Lazy.lazy view
-    , subscriptions = \_ -> Sub.none
-    }
+    , view = view
+    , init = init
+    } specs
