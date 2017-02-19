@@ -1,17 +1,57 @@
 var _gdotdesign$elm_styled_html$Native_Styles = function() {
   var currentID = 0
+  var rules = {}
+
+  window.rules= rules
 
   var styleElement = document.createElement('style')
   document.head.appendChild(styleElement)
 
-  var createRule = function(id) {
-    styleElement.sheet.insertRule('.' + id + '{}', 0)
-    return styleElement.sheet.cssRules[0]
+  var setStyle = function(id, selector, data) {
+    // Get rule
+    var rule = getRule(id, selector)
+
+    // Get styles
+    var style = rule.style
+
+    // Set styles
+    for (var i = 0; i < data.length; i++) {
+      var prop = data[i][0]
+      var value = data[i][1]
+      if(style.getPropertyValue(prop) != value){
+        style.setProperty(prop, value)
+      }
+    }
+  }
+
+  var getRule = function(id, selector) {
+    // Create empty object for the rules selectors
+    if(!rules[id]) { rules[id] = {} }
+
+    // Don't create rule if there is one
+    if(rules[id][selector]) { return rules[id][selector] }
+
+    // Create rule
+    styleElement.sheet.insertRule('.' + (id + selector) + '{}', 0)
+    var rule = styleElement.sheet.cssRules[0]
+
+    // Store rule
+    rules[id][selector] = rule
+
+    // Return rule
+    return rule
   }
 
   var removeRule = function(child){
-    if(child.__styleNode) {
-      child.__styleNode.parentStyleSheet.deleteRule(child.__styleNode)
+    if(child.__styleID) {
+      var childRules = rules[child.__styleID]
+
+      for (var key in childRules) {
+        var rule = childRules[key]
+        styleElement.sheet.deleteRule(rule)
+      }
+
+      delete rules[child.__styleID]
     }
   }
 
@@ -28,22 +68,22 @@ var _gdotdesign$elm_styled_html$Native_Styles = function() {
   }
 
   Object.defineProperty(Element.prototype, 'styles', {
-    set: function(values){
-      if (!values.length) { return }
-      if (!this.__styleNode) {
-        var id = 's-' + (currentID++)
-        this.classList.add(id)
-        this.__styleNode = createRule(id)
+    set: function(styles){
+      if (!this.__styleID) {
+        this.__styleID = 's-' + (currentID++)
+        this.classList.add(this.__styleID)
       }
 
-      var style = this.__styleNode.style
+      setStyle(this.__styleID, '', styles.data)
 
-      for (var i = 0; i < values.length; i++) {
-        var prop = values[i][0]
-        var value = values[i][1]
-        if(style.getPropertyValue(prop) != value){
-          style.setProperty(prop, value)
-        }
+      for (var i = 0; i < styles.childs.length; i++) {
+        var child = styles.childs[i]
+        setStyle(this.__styleID, ' ' + child.selector, child.data)
+      }
+
+      for (var i = 0; i < styles.pseudos.length; i++) {
+        var pseudo = styles.pseudos[i]
+        setStyle(this.__styleID, pseudo.selector, pseudo.data)
       }
     }
   })

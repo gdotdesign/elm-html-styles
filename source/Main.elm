@@ -1,6 +1,5 @@
-import StyledHtml
+import StyledHtml exposing (node, style, selector, pseudo)
 
-import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 import Html exposing (text)
 import Html.Lazy
@@ -29,28 +28,54 @@ update msg_ model =
 view : Model -> Html.Html Msg
 view model =
   let
+    child =
+      if model.show then
+        node "strong"
+          [ style [("color", "cyan")]
+          , pseudo "::before"
+            [ ("content", "'Hello'")
+            , ("color", "rebeccapurple")
+            , ("font-weight", "bold")
+            ]
+          , selector "i"
+            [ ("letter-spacing", "10px")]
+          ]
+          []
+          [ node "i" [] [] [text "strong"] ]
+      else
+        text ""
+
     display =
       if model.show then
         "block"
       else
         "none"
   in
-    StyledHtml.node "div"
-      [ ("background", "red")
-      , ("position", "absolute")
-      , ("padding", "20px")
-      , ("font-family", "sans")
+    node "div"
+      [ style
+        [ ("background", "red")
+        , ("position", "absolute")
+        , ("padding", "20px")
+        , ("font-family", "sans")
+        ]
       ]
       []
-      [ StyledHtml.node "span"
-        [("font-size", "20px")
-        ,("display", display) ]
+      [ node "span"
+        [ style
+          [("font-size", "20px")
+          ,("display", display)
+          ,("color", "#FFF")
+          ]
+        ]
         []
         [text "Blah"]
-      , StyledHtml.node "button"
-        [ ("background", "blue")
-        , ("border", "0")
-        , ("color", "#FFF")
+      , child
+      , node "button"
+        [ style
+          [ ("background", "blue")
+          , ("border", "0")
+          , ("color", "#FFF")
+          ]
         ]
         [ onClick Toggle ]
         [ text "Toggle" ]
@@ -62,5 +87,5 @@ main =
     { init = (init, Cmd.none)
     , update = update
     , view = Html.Lazy.lazy view
-    , subscriptions = \_ -> Mouse.moves Move
+    , subscriptions = \_ -> Sub.none --Mouse.moves Move
     }
