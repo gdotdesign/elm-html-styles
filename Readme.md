@@ -21,7 +21,7 @@ using the `elm-install` command.
 This package provides the `Html.Styles` module which exposes the following
 three functions:
 
-### `styles : List (String, String) -> List Style -> Html.Attribute msg`
+#### `styles : List (String, String) -> List Style -> Html.Attribute msg`
 This function takes two arguments:
 
 * the first is a list of property-value pairs (tuple) which will be applied to
@@ -29,14 +29,14 @@ This function takes two arguments:
 * the second is a list of sub selectors where each can be either a sub selector
   (like descendant or child selector) or a pseudo selector
 
-### `pseudo : String -> List (String, String) -> Style`
+#### `pseudo : String -> List (String, String) -> Style`
 This functions returns a `Style` to use in the `styles` function above, it is
 used to style pseudo elements of the main element. It takes two arguments:
 
 * the first is the pseudo selector `::before`, `::after`, '::placeholder', etc...
 * the second are the property-value paris (tuple) for the selector
 
-### `selector : String -> List (String, String) -> Style`
+#### `selector : String -> List (String, String) -> Style`
 This functions returns a `Style` to use in the `styles` function above, it is
 used to style sub elements of the main element. It takes two arguments:
 
