@@ -1,7 +1,6 @@
-
 {
   "version": "1.0.0",
-  "summary": "Styled HTML",
+  "summary": "Add CSS styles to your HTML elements!",
   "repository": "https://github.com/gdotdesign/elm-styled-html.git",
   "license": "BSD-2-Clause",
   "source-directories": [
@@ -10,6 +9,7 @@
   ],
   "native-modules": true,
   "exposed-modules": [
+    "Styles"
   ],
   "dependencies": {
     "elm-lang/mouse": "1.0.1 <= v < 2.0.0",

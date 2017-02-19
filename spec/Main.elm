@@ -1,4 +1,4 @@
-import StyledHtml exposing (styles, selector, pseudo)
+import Styles exposing (styles, selector, pseudo)
 
 import Html.Events exposing (onClick)
 import Html exposing (node, text)
