@@ -33,7 +33,7 @@ This function takes two arguments:
 This functions returns a `Style` to use in the `styles` function above, it is
 used to style pseudo elements of the main element. It takes two arguments:
 
-* the first is the pseudo selector `::before`, `::after`, '::placeholder', etc...
+* the first is the pseudo selector `::before`, `::after`, `::placeholder`, etc...
 * the second are the property-value paris (tuple) for the selector
 
 #### `selector : String -> List (String, String) -> Style`
@@ -119,7 +119,7 @@ A more detalied explanation:
 
 * `Element.prototype.removeChild` and `Element.prototype.replaceChild` functions
   are patched so when removing an element the created rules for it are
-  removed as well.
+  also removed.
 
 * The data for the styles are converted to a JS object with `Json.Encode` and then
   passed to the `Element.prototype.styles` with `Html.Attribute.property`
