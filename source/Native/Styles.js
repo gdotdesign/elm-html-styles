@@ -1,90 +1,124 @@
-var _gdotdesign$elm_styled_html$Native_Styles = function() {
+/* eslint-env browser */
+
+(function () {
+  // Set up "global" variables that tracks the ID and the rules
   var currentID = 0
   var rules = {}
 
-  window.rules= rules
-
+  // Create a style tag to hold the styles and append it to the HEAD
   var styleElement = document.createElement('style')
   document.head.appendChild(styleElement)
 
-  var setStyle = function(id, selector, data) {
-    // Get rule
+  /* This function sets the styles for an element with the given ID using the
+     provided selector and style data.
+  */
+  var setStyle = function (id, selector, data) {
+    // Get the rule object
     var rule = getRule(id, selector)
 
-    // Get styles
+    // Get the styles object
     var style = rule.style
 
-    // Set styles
+    // Set the styles
     for (var i = 0; i < data.length; i++) {
       var prop = data[i][0]
       var value = data[i][1]
-      if(style.getPropertyValue(prop) != value){
+      if (style.getPropertyValue(prop) !== value) {
         style.setProperty(prop, value)
       }
     }
   }
 
-  var getRule = function(id, selector) {
+  /* This function returns a [rule](https://developer.mozilla.org/en-US/docs/Web/API/CSSRule)
+     object for an element with the given ID using the provided selector.
+  */
+  var getRule = function (id, selector) {
     // Create empty object for the rules selectors
-    if(!rules[id]) { rules[id] = {} }
+    if (!rules[id]) { rules[id] = {} }
 
-    // Don't create rule if there is one
-    if(rules[id][selector]) { return rules[id][selector] }
+    // Don't create the rule if there is one but return it instead
+    if (rules[id][selector]) { return rules[id][selector] }
 
-    // Create rule
+    // Create the rule
     styleElement.sheet.insertRule('.' + (id + selector) + '{}', 0)
     var rule = styleElement.sheet.cssRules[0]
 
-    // Store rule
+    // Store the rule
     rules[id][selector] = rule
 
-    // Return rule
+    // Return the rule
     return rule
   }
 
-  var removeRule = function(child){
-    if(child.__styleID) {
-      var childRules = rules[child.__styleID]
+  /* Remove all rules related to the given child */
+  var removeRule = function (child) {
+    // Exit if there is nothing to do
+    if (child.__styleID) { return }
 
-      for (var key in childRules) {
-        var rule = childRules[key]
-        styleElement.sheet.deleteRule(rule)
-      }
+    // Iterate over the rules for the element
+    var childRules = rules[child.__styleID]
 
-      delete rules[child.__styleID]
+    for (var key in childRules) {
+      // Get the rule
+      var rule = childRules[key]
+
+      // Remove the rule
+      styleElement.sheet.deleteRule(rule)
     }
+
+    // Remove references
+    delete rules[child.__styleID]
+    delete child.__styleID
   }
 
+  /* Patch removeChild and replaceChild to remove styles for an element
+     if it's removed from the DOM. (only these are used in elm-lang/virtual-dom)
+  */
   Element.prototype.oldRemoveChild = Element.prototype.removeChild
-  Element.prototype.removeChild = function(child){
+  Element.prototype.removeChild = function (child) {
     removeRule(child)
     return this.oldRemoveChild(child)
   }
 
   Element.prototype.oldReplaceChild = Element.prototype.replaceChild
-  Element.prototype.replaceChild = function(newNode, child){
+  Element.prototype.replaceChild = function (newNode, child) {
     removeRule(child)
     return this.oldReplaceChild(newNode, child)
   }
 
+  /* Create a setter for a property so we can apply styles to it's element
+     from Elm:
+
+        { data : List (String, String)
+        , pseudos : List { selector : String, data : List (String, String ) }
+        , childs : List { selector : String, data : List (String, String ) }
+        }
+  */
   Object.defineProperty(Element.prototype, 'styles', {
-    set: function(styles){
+    get: function () { null },
+    set: function (styles) {
+      // Create a unique id for the element
       if (!this.__styleID) {
         this.__styleID = 's-' + (currentID++)
         this.classList.add(this.__styleID)
       }
 
+      // Apply the basic styles
       setStyle(this.__styleID, '', styles.data)
 
-      for (var i = 0; i < styles.childs.length; i++) {
+      var i
+
+      // Itarate over the child selectors and apply their styles
+      for (i = 0; i < styles.childs.length; i++) {
         var child = styles.childs[i]
         setStyle(this.__styleID, ' ' + child.selector, child.data)
       }
 
-      for (var i = 0; i < styles.pseudos.length; i++) {
+      // Iterate over the pseudo selectors and apply their styles
+      for (i = 0; i < styles.pseudos.length; i++) {
         var pseudo = styles.pseudos[i]
         setStyle(this.__styleID, pseudo.selector, pseudo.data)
       }
     }
   })
-}()
+}())

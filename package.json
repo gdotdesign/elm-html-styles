@@ -7,8 +7,9 @@
   },
   "dependencies": {
     "elm": "^0.18.0",
+    "elm-github-install": "^0.3.0",
     "elm-spec": "^1.1.0",
-    "elm-github-install": "^0.3.0"
+    "standard": "^8.6.0"
   },
   "engines": {
     "node": ">= 4"
