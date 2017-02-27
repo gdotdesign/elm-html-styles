@@ -19,7 +19,7 @@
     // Get the styles object
     var style = rule.style
 
-    var i
+    var i, j
 
     // Remove non existent styles
     for (i = 0; i < (rule.previousData || []).length; i++) {
@@ -36,7 +36,16 @@
     for (i = 0; i < data.length; i++) {
       var prop = data[i][0]
       var value = data[i][1]
-      if (style.getPropertyValue(prop) !== value) {
+
+      var oldValue = null
+      for (j = 0; j < (rule.previousData || []).length; j++) {
+        if (rule.previousData[j][0] === prop) {
+          oldValue = rule.previousData[j][1]
+          break
+        }
+      }
+
+      if (oldValue !== value) {
         style.setProperty(prop, value)
       }
     }
