@@ -6,18 +6,25 @@ import Html.Lazy
 import Spec exposing (..)
 
 type alias Model =
-  { show : Bool }
+  { show : Bool
+  , replace : Bool
+  }
 
 type Msg
   = Toggle
+  | Replace
 
 init : () -> Model
 init _ =
-  { show = False }
+  { show = False
+  , replace = False
+  }
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg_ model =
   case msg_ of
+    Replace ->
+      ({ model | replace = not model.replace }, Cmd.none)
     Toggle ->
       ({ model | show = not model.show }, Cmd.none)
 
@@ -48,34 +55,58 @@ view model =
       else
         [( "display", "none" )]
   in
-    node "div"
-      [ styles
-        [ ("background", "red")
-        , ("padding", "20px")
-        , ("font-family", "sans")
+    if model.replace then
+      node "div" []
+        [ node "button"
+          [ styles
+            [ ("background", "blue")
+            , ("border", "0")
+            , ("color", "#FFF")
+            ]
+            []
+          , onClick Replace
+          ]
+          [ text "Replace" ]
         ]
-        []
-      ]
-      [ node "span"
+    else
+      node "div"
         [ styles
-          ([("font-size", "20px")
-          ,("color", "#FFF")
-          ] ++ display)
-          []
-        ]
-        [text "Blah"]
-      , child
-      , node "button"
-        [ styles
-          [ ("background", "blue")
-          , ("border", "0")
-          , ("color", "#FFF")
+          [ ("background", "red")
+          , ("padding", "20px")
+          , ("font-family", "sans")
           ]
           []
-        , onClick Toggle
         ]
-        [ text "Toggle" ]
-      ]
+        [ node "span"
+          [ styles
+            ([("font-size", "20px")
+            ,("color", "#FFF")
+            ] ++ display)
+            []
+          ]
+          [text "Blah"]
+        , child
+        , node "button"
+          [ styles
+            [ ("background", "blue")
+            , ("border", "0")
+            , ("color", "#FFF")
+            ]
+            []
+          , onClick Toggle
+          ]
+          [ text "Toggle" ]
+        , node "button"
+          [ styles
+            [ ("background", "blue")
+            , ("border", "0")
+            , ("color", "#FFF")
+            ]
+            []
+          , onClick Replace
+          ]
+          [ text "Replace" ]
+        ]
 
 specs =
   describe "Html.Styles"
@@ -110,6 +141,25 @@ specs =
         { style = "letter-spacing"
         , selector = "i"
         , value = "10px"
+        }
+      ]
+    , it "Clears element"
+      [ assert.styleEquals
+        { style = "background"
+        , selector = "div"
+        , value = "red"
+        }
+      , steps.click "button:last-of-type"
+      , assert.styleEquals
+        { style = "background"
+        , selector = "div"
+        , value = ""
+        }
+      , steps.click "button:last-of-type"
+      , assert.styleEquals
+        { style = "background"
+        , selector = "div"
+        , value = "red"
         }
       ]
     ]

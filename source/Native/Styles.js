@@ -77,7 +77,20 @@
   /* Remove all rules related to the given child */
   var removeRule = function (child) {
     // Exit if there is nothing to do
-    if (child.__styleID) { return }
+    if (!child.__styleID) { return }
+
+    // Clear rules
+    clearRule(child)
+
+    // Remove references
+    delete rules[child.__styleID]
+    delete child.__styleID
+  }
+
+  /* Removes all rules for a given element */
+  var clearRule = function (child) {
+    // Exit if there is nothing to do
+    if (!child.__styleID) { return }
 
     // Iterate over the rules for the element
     var childRules = rules[child.__styleID]
@@ -91,8 +104,7 @@
     }
 
     // Remove references
-    delete rules[child.__styleID]
-    delete child.__styleID
+    rules[child.__styleID] = {}
   }
 
   /* Patch removeChild and replaceChild to remove styles for an element
@@ -121,6 +133,9 @@
   Object.defineProperty(Element.prototype, 'styles', {
     get: function () { null },
     set: function (styles) {
+      // Clear rules if there is no next styles
+      if (!styles) { return clearRule(this) }
+
       // Create a unique id for the element
       if (!this.__styleID) {
         this.__styleID = 's-' + (currentID++)
