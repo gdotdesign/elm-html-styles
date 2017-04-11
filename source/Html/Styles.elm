@@ -18,6 +18,7 @@ import Native.Styles
 type Selector
   = Child String
   | Pseudo String
+  | Pseudos (List String)
 
 
 {-| Representation of a sub style.
@@ -62,11 +63,19 @@ selector string =
   Style (Child string)
 
 
-{-| returns a pseudo selector to use in an elements styles.
+{-| Returns a pseudo selector to use in an elements styles.
 -}
 pseudo : String -> List (String, String) -> Style
 pseudo string =
   Style (Pseudo string)
+
+
+{-| Returns a list of pseudo selectors to use in an elements styles with the
+same data.
+-}
+pseudos : List String -> List (String, String) -> Style
+pseudos selectors =
+  Style (Pseudos selectors)
 
 
 {-| Encodes the data for the styles property.
@@ -84,6 +93,11 @@ encodeStyles selfStyles styles =
         Pseudo _ -> True
         _ -> False
 
+    isPseudos style =
+      case style.selector of
+        Pseudos _ -> True
+        _ -> False
+
     baseData =
       selfStyles
         |> encodeData
@@ -94,15 +108,32 @@ encodeStyles selfStyles styles =
           case item.selector of
             Pseudo value -> value
             Child value -> value
+            Pseudos _ -> ""
       in
         Json.object
-        [ ( "selector", Json.string selector )
-        , ( "data",     encodeData item.data )
-        ]
+          [ ( "selector", Json.string selector )
+          , ( "data",     encodeData item.data )
+          ]
+
+    mapMultiplePseudos {selector, data} =
+      case selector of
+        Pseudos items ->
+          List.map (\selector -> Style (Pseudo selector) data) items
+        _ ->
+          []
+
+    singlePseudos =
+      styles
+        |> List.filter isPseudos
+        |> List.map mapMultiplePseudos
+        |> List.foldl (++) []
+
+    multiPseudos =
+      styles
+        |> List.filter isPseudos
 
     pseudos =
-      styles
-        |> List.filter isPseudo
+      (singlePseudos ++ multiPseudos)
         |> List.map encodeItem
         |> Json.list
 
