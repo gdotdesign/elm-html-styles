@@ -125,12 +125,12 @@ encodeStyles selfStyles styles =
     singlePseudos =
       styles
         |> List.filter isPseudo
-        |> List.map mapMultiplePseudos
-        |> List.foldl (++) []
 
     multiPseudos =
       styles
         |> List.filter isPseudos
+        |> List.map mapMultiplePseudos
+        |> List.foldl (++) []
 
     pseudos =
       (singlePseudos ++ multiPseudos)
