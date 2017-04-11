@@ -13,44 +13,52 @@
      provided selector and style data.
   */
   var setStyle = function (id, selector, data) {
-    // Get the rule object
-    var rule = getRule(id, selector)
+    /* Try/catch is for catching the following error:
+    /    SyntaxError: Failed to execute 'insertRule' on 'CSSStyleSheet':
+         Failed to parse the rule 'rule here...'
+    */
+    try {
+      // Get the rule object
+      var rule = getRule(id, selector)
 
-    // Get the styles object
-    var style = rule.style
+      // Get the styles object
+      var style = rule.style
 
-    var i, j
+      var i, j
 
-    // Remove non existent styles
-    for (i = 0; i < (rule.previousData || []).length; i++) {
-      var index = data.findIndex(function (item) {
-        return item[0] === rule.previousData[i][0]
-      })
+      // Remove non existent styles
+      for (i = 0; i < (rule.previousData || []).length; i++) {
+        var index = data.findIndex(function (item) {
+          return item[0] === rule.previousData[i][0]
+        })
 
-      if (index === -1) {
-        style.removeProperty(rule.previousData[i][0])
-      }
-    }
-
-    // Set the styles
-    for (i = 0; i < data.length; i++) {
-      var prop = data[i][0]
-      var value = data[i][1]
-
-      var oldValue = null
-      for (j = 0; j < (rule.previousData || []).length; j++) {
-        if (rule.previousData[j][0] === prop) {
-          oldValue = rule.previousData[j][1]
-          break
+        if (index === -1) {
+          style.removeProperty(rule.previousData[i][0])
         }
       }
 
-      if (oldValue !== value) {
-        style.setProperty(prop, value)
-      }
-    }
+      // Set the styles
+      for (i = 0; i < data.length; i++) {
+        var prop = data[i][0]
+        var value = data[i][1]
 
-    rule.previousData = data
+        var oldValue = null
+        for (j = 0; j < (rule.previousData || []).length; j++) {
+          if (rule.previousData[j][0] === prop) {
+            oldValue = rule.previousData[j][1]
+            break
+          }
+        }
+
+        if (oldValue !== value) {
+          style.setProperty(prop, value)
+        }
+      }
+
+      rule.previousData = data
+    } catch (error) {
+      console.warn('Could not set styles for selector: ' + selector + '\n' + error.toString())
+    }
   }
 
   /* This function returns a [rule](https://developer.mozilla.org/en-US/docs/Web/API/CSSRule)

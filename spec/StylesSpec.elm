@@ -75,7 +75,10 @@ view model =
           , ("padding", "20px")
           , ("font-family", "sans")
           ]
-          []
+          [ selector "33invalid"
+            [ ( "opacity", "0.6" )
+            ]
+          ]
         ]
         [ node "span"
           [ styles
