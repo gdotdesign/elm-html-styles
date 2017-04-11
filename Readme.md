@@ -1,6 +1,6 @@
 # elm-html-styles
 [![Build Status](https://travis-ci.org/gdotdesign/elm-html-styles.svg?branch=master)](https://travis-ci.org/gdotdesign/elm-html-styles)
-![Elm Package Version](https://img.shields.io/badge/elm%20package-1.0.3-brightgreen.svg)
+![Elm Package Version](https://img.shields.io/badge/elm%20package-1.1.0-brightgreen.svg)
 
 This package helps you to add CSS styles simply and dynamically to HTML
 elements.
