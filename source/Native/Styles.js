@@ -95,6 +95,22 @@
     delete child.__styleID
   }
 
+  /* Gets the index of a rule in it's stylesheet */
+  var getRuleIndex = function (rule) {
+    if (!rule.parentStyleSheet) { return -1 }
+
+    // For is the only way to iterate over the rules by index
+    for (var index in rule.parentStyleSheet.cssRules) {
+      var item = rule.parentStyleSheet.cssRules[index]
+
+      if (item === rule) {
+        return index
+      }
+    }
+
+    return -1
+  }
+
   /* Removes all rules for a given element */
   var clearRule = function (child) {
     // Exit if there is nothing to do
@@ -107,8 +123,9 @@
       // Get the rule
       var rule = childRules[key]
 
-      // Remove the rule
-      styleElement.sheet.deleteRule(rule)
+      // Remove the rule by index
+      // https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet/deleteRule
+      styleElement.sheet.deleteRule(getRuleIndex(rule))
     }
 
     // Remove references
