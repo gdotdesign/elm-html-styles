@@ -43,6 +43,9 @@ view model =
               ]
             , selector "i"
               [ ("letter-spacing", "10px")]
+            , selector "i"
+              [ ( "overflow", "hidden" )
+              ]
             ]
           ]
           [ node "i" [] [text "strong"] ]
@@ -144,6 +147,11 @@ specs =
         { style = "letter-spacing"
         , selector = "i"
         , value = "10px"
+        }
+      , assert.styleEquals
+        { style = "overflow"
+        , value = "hidden"
+        , selector = "i"
         }
       ]
     , it "Clears element"

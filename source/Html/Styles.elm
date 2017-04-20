@@ -78,6 +78,33 @@ pseudos selectors =
   Style (Pseudos selectors)
 
 
+{-| Folds the styles.
+-}
+foldStyles : Style -> List Style -> List Style
+foldStyles style styles =
+  let
+    ( matchedStyles, otherStyles) =
+      List.partition (.selector >> (==) style.selector) styles
+
+    mergedStyle =
+      { selector = style.selector
+      , data =
+        matchedStyles
+          |> List.map .data
+          |> List.foldr (++) []
+          |> List.append style.data
+      }
+  in
+    mergedStyle :: otherStyles
+
+
+{-| Merges the data from same styles into a single style.
+-}
+mergeStyles : List Style -> List Style
+mergeStyles styles =
+  List.foldr foldStyles [] styles
+
+
 {-| Encodes the data for the styles property.
 -}
 encodeStyles : List (String, String) -> List Style -> Json.Value
@@ -134,12 +161,14 @@ encodeStyles selfStyles styles =
 
     pseudos =
       (singlePseudos ++ multiPseudos)
+        |> mergeStyles
         |> List.map encodeItem
         |> Json.list
 
     childs =
       styles
         |> List.filter isChild
+        |> mergeStyles
         |> List.map encodeItem
         |> Json.list
 
